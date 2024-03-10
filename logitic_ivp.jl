@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.38
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
@@ -7,49 +7,141 @@ using InteractiveUtils
 # ╔═╡ 521181ff-67eb-42dc-8b84-8caf148dcd7e
 using Plots
 
+# ╔═╡ 470c6265-f881-4bbb-8e90-ff281e97445e
+md"""
+# Julia と型， 多重ディスパッチ
+
+このノートブックでは [大槻純也, Pythonによる計算物理, 森北出版](https://www.morikita.co.jp/books/mid/017081) をテキストと呼び，同書の第2章を題材として取り上げています． ナイーブな微分方程式ソルバーを実装しロジスティック方程式
+
+```math
+\frac{dy}{dt} = f(y) \coloneqq y(1 - y)
+```
+
+を解いてみましょう． テキストではオイラー法, 修正オイラー法, ルンゲ・クッタ法などいくつか微分方程式を解くためのアルゴリズムが紹介されています． これらのアルゴリズムは時刻 $t$ の時における $y$ が与えられた時に $t + \Delta t$ での $y$ を計算するという意味では共通しています． つまり
+
+```julia
+y_next = step(t, y, Δt）
+```
+
+という量を計算するという意味では共通しています． この類似性に着目しこれらのアルゴリズムを系統的に実装するにはどうすれば良いでしょうか？
+
+例えば Python に慣れている方であれば `IVPSolver` というざっくりとした親クラスを用意し各アルゴリズムに対応する子クラスを実装すれば良さそうだと考えるでしょう．
+
+```python
+# 初期値問題を取り扱う基底クラス
+# なお，　このPython実装は文字通り適当に書いているので動作する保証は全くない
+# Python が得意な受講者は実際に動くように修正し修正するプルリクエストを作ると面白いだろう
+class IVPSolver():
+	def solve(self, tspan: list, yinit: float)
+		# 微分方程式を解く
+		dt = tspan[1] - tspan[0]
+		ys = [yinit,]
+
+		for i in len(tspan):
+			if i == len(ys)
+				break
+			y_next = self.step(ys[i], dt)
+			ys.append(y_next)
+		end
+		# plt.plot(ts, ys) によって解を描画したいなぁという気持ち
+		return ys
+
+# オイラー法
+class Euler(IVPSolver):
+	def __init__(self, f):
+		self.f = f
+
+	def step(self, y, dt):
+		y_next = y + self.f(y) * dt
+		return y_next
+
+# 修正オイラー法の実装
+class ModifiedEuler(IVPSolver):
+	pass
+
+# ルンゲ・クッタ法の実装
+class RK(IVPSolver):
+	pass
+
+# ロジスティック方程式の右辺
+def f(y):
+	return y * (1 - y)
+
+import numpy as np
+from matplotlib import pyplot as plt
+tmax = 20
+nt = 101
+tspan = linspace(0, tmax, nt)
+dt = tspan[begin+1]-tspan[begin]
+yinit = 1e-3
+# オイラー法による解放を提供するコンストラクタを作成
+solver = Euler(f)
+# 微分方程式を解く
+ys = solver.solve(tspan, yinit)
+plt.scatter(tspan, ys)
+```
+
+上記の実装のように基底クラスを継承し `step` メソッドを実装すれば微分方程式を解くコードや可視化する箇所はつかい回せそうだ． このように基底クラスを出発点とし各事情に合わせてどんどん実装を育てていくやり方がよく行われている． Julia の場合は"クラスの継承"の代わりに抽象型と多重ディスパッチを組み合わせて類似のことを実現できる.
+"""
+
+# ╔═╡ 9fc9f5fa-3634-4777-9fda-9a4dda3a5e8c
+md"""
+## パッケージのロード
+"""
+
+# ╔═╡ bb4089b6-2d05-49f0-901a-9a977eb954d4
+md"""
+ロジスティック方程式の右辺は次のように書ける:
+"""
+
 # ╔═╡ e8bc3d4e-cb4f-11ee-0d29-0307845be82c
-f(y) = y*(one(y) - y)
+f(y) = y*(1 - y) # y * (one(y) - y) とも書ける
 
-# ╔═╡ 7d9183e9-9173-465e-a82f-d1826db0a6b2
-abstract type ODESolver end
+# ╔═╡ 7e3585ac-bab5-408a-b581-79a60004b372
+md"""
+`solve` 関数の中でループをぐるぐる回し `y=ys[i]` が与えられた時に `ynext = step(solver, y)` を計算するロジックを実装している． `step` の処理は未実装であり，これは各アルゴリズムに依存する． `solver` オブジェクトは `IVPSolver` のサブタイプとして実装する. 例えばオイラー法の場合は次のようにして実装できる．
+"""
 
-# ╔═╡ 2596fc08-02f7-4a8b-a8d8-291ffa5372bb
-begin
-	struct Euler{Fn, T<:AbstractFloat} <: ODESolver 
-		f::Fn
-		dt::T
-	end
-	
-	function step(sf::Euler, y)
-		return y + sf.f(y) * sf.dt
-	end
-end
+# ╔═╡ 2a718086-6cb7-477b-a20d-4a30f885ede4
+md"""
+このようにすると `solver = Euler(f, dt)` によってソルバーのインスタンスを作れば
 
-# ╔═╡ 6fe74fa6-1c65-4db9-806d-3cf9f176afe8
-begin
-	struct Heun{Fn, T<:AbstractFloat} <: ODESolver 
-		f::Fn
-		dt::T
-	end
-	
-	function step(solver::Heun, y)
-		f = solver.f
-		dt = solver.dt
-		
-		k1 = f(y)
-		k3 = f(y + k1 * dt) 
-		return y + (k1 + k3) * dt / 2
-	end
-end
+```julia
+solve(solver, <t の動く範囲>, <初期値>)
+```
+
+と実行することで微分方程式を解くことができる. 実際に次のセルのようにして実行できる.
+"""
+
+# ╔═╡ 3bd87598-fed2-4f0b-a7e3-14978bc3a356
+md"""
+実行結果は厳密解と少しずれている． これはソフトウェアのバグではなく，オイラー法の精度に起因するものである.
+"""
+
+# ╔═╡ 9bbdabff-2e71-4576-9ad1-a017af56764a
+md"""
+さて `solve` 関数には
+
+```julia
+solve(solver::IVPSolver, ...
+```
+
+のように型アノテーションが付いていた. これは `T <: IVPSolver` を満たす型 `T` のオブジェクトを受け付けると理解すれば良い. 
+"""
+
+# ╔═╡ 950de090-69f3-47f4-a7e2-73067140f078
+md"""
+同様に `IVPSolver` のサブタイプとなるように修正オイラー法，ルンゲ・クッタ法に対応する型を実装する.
+"""
 
 # ╔═╡ e7dd8651-3f0d-4a32-885c-d0b102a04df3
 begin
-	struct LK54{Fn, T<:AbstractFloat} <: ODESolver 
+	struct RK{Fn, T<:AbstractFloat} <: IVPSolver 
 		f::Fn
 		dt::T
 	end
 	
-	function step(solver::LK54, y)
+	function step(solver::RK, y)
 		f = solver.f
 		dt = solver.dt
 		
@@ -61,18 +153,45 @@ begin
 	end
 end
 
-# ╔═╡ 57448a0a-c23e-4e57-825a-d90296483de1
-function solve(solver::ODESolver, f::Function, tspan, yinit)
-	dt = tspan[begin+1] - tspan[begin]
-	ys = similar(tspan)
-	ys[begin] = yinit
-	
-	for i in eachindex(ys)
-		i == length(ys) && break
-		ys[i+1] = step(solver, ys[i])
+# ╔═╡ 7d9183e9-9173-465e-a82f-d1826db0a6b2
+begin
+	"""
+		IVPSolver
+
+	初期値問題を解く微分方程式ソルバーを取りまとめる抽象型
+	"""
+	abstract type IVPSolver end
+
+	"""
+		 solve(solver::IVPSolver, tspan, yinit)
+
+	`yinit` を初期値とする常微分方程式 \$\\frac{dy}{dt} = f(y)\$ を \$t \\in\$ `tspan` の範囲で解く.
+	"""
+	function solve(solver::IVPSolver, tspan, yinit)
+		ys = similar(tspan)
+		ys[begin] = yinit
+		
+		for i in eachindex(tspan, ys)
+			i == length(ys) && break
+			y = ys[i]
+			ynext = step(solver, y)
+			ys[i+1] = ynext
+		end
+		
+		return ys
+	end
+end
+
+# ╔═╡ 2596fc08-02f7-4a8b-a8d8-291ffa5372bb
+begin
+	struct Euler{Fn, T<:AbstractFloat} <: IVPSolver 
+		f::Fn
+		dt::T
 	end
 	
-	return ys
+	function step(sf::Euler, y)
+		return y + sf.f(y) * sf.dt
+	end
 end
 
 # ╔═╡ 71286f7d-9f82-4293-a90f-b8d46976d5be
@@ -83,9 +202,26 @@ let
 	dt = tspan[begin+1]-tspan[begin]
 	solver = Euler(f, dt)
 	yinit = 1e-3
-	sol = solve(solver, f, tspan, yinit)
+	sol = solve(solver, tspan, yinit)
 	scatter(range(0, tmax, length=nt), sol, label="$(nameof(typeof(solver)))")
 	plot!(t->(yinit/(yinit + (1 - yinit) * exp(-t))), label="exact")
+end
+
+# ╔═╡ 6fe74fa6-1c65-4db9-806d-3cf9f176afe8
+begin
+	struct ModifiedEuler{Fn, T<:AbstractFloat} <: IVPSolver 
+		f::Fn
+		dt::T
+	end
+	
+	function step(solver::ModifiedEuler, y)
+		f = solver.f
+		dt = solver.dt
+		
+		k1 = f(y)
+		k3 = f(y + k1 * dt) 
+		return y + (k1 + k3) * dt / 2
+	end
 end
 
 # ╔═╡ d2aecd4e-2c68-4ceb-af94-626bdb0f5743
@@ -94,9 +230,9 @@ let
 	nt = 101
 	tspan = range(0, tmax, length=nt)
 	dt = tspan[begin+1]-tspan[begin]
-	solver = Heun(f, dt)
+	solver = ModifiedEuler(f, dt)
 	yinit = 1e-3
-	sol = solve(solver, f, tspan, yinit)
+	sol = solve(solver, tspan, yinit)
 	scatter(range(0, tmax, length=nt), sol, label="$(nameof(typeof(solver)))")
 	plot!(t->(yinit/(yinit + (1 - yinit) * exp(-t))), label="exact")
 end
@@ -107,12 +243,17 @@ let
 	nt = 101
 	tspan = range(0, tmax, length=nt)
 	dt = tspan[begin+1]-tspan[begin]
-	solver = LK54(f, dt)
+	solver = RK(f, dt)
 	yinit = 1e-3
-	sol = solve(solver, f, tspan, yinit)
+	sol = solve(solver, tspan, yinit)
 	scatter(range(0, tmax, length=nt), sol, label="$(nameof(typeof(solver)))", alpha=0.5)
 	plot!(t->(yinit/(yinit + (1 - yinit) * exp(-t))), label="exact", alpha=0.5, lw=3)
 end
+
+# ╔═╡ b157df51-efef-49ef-8c50-0810dd012993
+md"""
+さて， 実装を進めるにつれて `step (generic function with N methods)` の `N` の部分がどんどん増えてることに気づいてるだろうか？ Julia は入力の引数の数，型に応じて関数の振る舞いを制御できる．この仕組みを Julia では多重ディスパッチと呼ぶ． 今回は 3 種類の具体的なソルバーを用意し対応する `step` メソッドを実装しているので `N methods` の N として 3 になっている.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1178,15 +1319,23 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
+# ╟─470c6265-f881-4bbb-8e90-ff281e97445e
+# ╟─9fc9f5fa-3634-4777-9fda-9a4dda3a5e8c
 # ╠═521181ff-67eb-42dc-8b84-8caf148dcd7e
+# ╟─bb4089b6-2d05-49f0-901a-9a977eb954d4
 # ╠═e8bc3d4e-cb4f-11ee-0d29-0307845be82c
 # ╠═7d9183e9-9173-465e-a82f-d1826db0a6b2
+# ╟─7e3585ac-bab5-408a-b581-79a60004b372
 # ╠═2596fc08-02f7-4a8b-a8d8-291ffa5372bb
+# ╟─2a718086-6cb7-477b-a20d-4a30f885ede4
+# ╠═71286f7d-9f82-4293-a90f-b8d46976d5be
+# ╟─3bd87598-fed2-4f0b-a7e3-14978bc3a356
+# ╟─9bbdabff-2e71-4576-9ad1-a017af56764a
+# ╟─950de090-69f3-47f4-a7e2-73067140f078
 # ╠═6fe74fa6-1c65-4db9-806d-3cf9f176afe8
 # ╠═e7dd8651-3f0d-4a32-885c-d0b102a04df3
-# ╠═57448a0a-c23e-4e57-825a-d90296483de1
-# ╠═71286f7d-9f82-4293-a90f-b8d46976d5be
 # ╠═d2aecd4e-2c68-4ceb-af94-626bdb0f5743
 # ╠═533f0d38-be86-4bfe-8eea-32c1c8b4e8f5
+# ╟─b157df51-efef-49ef-8c50-0810dd012993
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
