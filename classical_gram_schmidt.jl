@@ -56,6 +56,11 @@ end
 # ╔═╡ 3ff41189-0b8f-459d-87af-2d927cba6d4c
 struct ClassicalGramSchmidt end # Algorithm
 
+# ╔═╡ 3d7af0be-0cc0-4a04-89a7-2721b12d7e6c
+md"""
+`q⃗̃ₙ₊₁` というのを変数として利用でき，その入力支援も備わっているのが Julia の良いところ
+"""
+
 # ╔═╡ 24a69ae7-2574-4e35-bb4b-9ccb72b42521
 function orthonormalize(::Type{ClassicalGramSchmidt}, A)
     a⃗₁ = A[:, 1]
@@ -169,6 +174,7 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 # ╠═a5978b5d-e211-4f5d-9c55-6eb4e7af3fc5
 # ╠═539319ce-ca4d-4de7-8469-e896b589c690
 # ╠═3ff41189-0b8f-459d-87af-2d927cba6d4c
+# ╟─3d7af0be-0cc0-4a04-89a7-2721b12d7e6c
 # ╠═24a69ae7-2574-4e35-bb4b-9ccb72b42521
 # ╠═dc268e9b-b2ca-4143-abe9-5beb87f4f723
 # ╟─00000000-0000-0000-0000-000000000001
