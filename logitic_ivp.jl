@@ -255,6 +255,15 @@ md"""
 さて， 実装を進めるにつれて `step (generic function with N methods)` の `N` の部分がどんどん増えてることに気づいてるだろうか？ Julia は入力の引数の数，型に応じて関数の振る舞いを制御できる．この仕組みを Julia では多重ディスパッチと呼ぶ． 今回は 3 種類の具体的なソルバーを用意し対応する `step` メソッドを実装しているので `N methods` の N として 3 になっている.
 """
 
+# ╔═╡ 00ae1557-9d2c-401e-83df-010f9af89021
+md"""
+
+実際には Python であれば SciPy, Julia であれば DifferentialEquations.jl が提供しているソルバーを利用するべき
+
+- [scipy_solve_ivp](https://atelierarith.github.io/intro2software_with_julia_pluto_materials/scipy_solve_ivp.html)
+- [ode](https://atelierarith.github.io/intro2software_with_julia_pluto_materials/ode.html)
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1337,5 +1346,6 @@ version = "1.4.1+1"
 # ╠═d2aecd4e-2c68-4ceb-af94-626bdb0f5743
 # ╠═533f0d38-be86-4bfe-8eea-32c1c8b4e8f5
 # ╟─b157df51-efef-49ef-8c50-0810dd012993
+# ╟─00ae1557-9d2c-401e-83df-010f9af89021
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
