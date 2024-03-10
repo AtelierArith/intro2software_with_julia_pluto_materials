@@ -297,6 +297,19 @@ md"""
 を眺めながら色々試行錯誤して欲しい． 今回のような場合には固定長配列をサポートする [StaticArrays.jl](https://github.com/JuliaArrays/StaticArrays.jl) を用いることを検討するべきである． StaticArrays.jl は日本人も含めた多くの人によってメンテナンスされている主要なパッケージの一つである．
 """
 
+# ╔═╡ bbf33a1f-42f3-439c-be61-6815cc775a1c
+md"""
+## 発展的な内容
+
+- 今回実装した Affine 変換の実行速度の改善する方法は [数学と物理におけるJuliaの活用](https://joint1.imi.kyushu-u.ac.jp/research_chooses/view/2023a015) で作成していた[スライド](https://atelierarith.github.io/julia_tutorial/slideshow/tutorial_part1/build/#55) にヒント・答えが書いてある． 読むのすら時間が惜しい方は [こちら](https://atelierarith.github.io/intro2software_with_julia_pluto_materials/ifs_revised.html) のノートブックを試すと良い. なんにせよ．読者の演習問題とする．
+
+- Affine 変換パラメータを変えるとそれに応じて模様が変化する． [Lévy C curve](https://atelierarith.github.io/intro2software_with_julia_pluto_materials/ifs_l%C3%A9vy.html) も有名な例である．
+- さらに機械的に多様な幾何学模様を生成するアルゴリズムも知られている． [random_logos](https://atelierarith.github.io/intro2software_with_julia_pluto_materials/random_logos.html)
+"""
+
+# ╔═╡ 9ef49885-6c83-4334-94ab-2a1c18a9e39d
+
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1493,5 +1506,7 @@ version = "1.4.1+0"
 # ╟─0a42bdf5-7c14-470d-b772-8b4bcbf9b9e0
 # ╠═22dd99ac-4b53-4664-8ec7-9a7ce852ff9b
 # ╟─8de58d64-534a-4691-885f-0f2c9a418bee
+# ╟─bbf33a1f-42f3-439c-be61-6815cc775a1c
+# ╠═9ef49885-6c83-4334-94ab-2a1c18a9e39d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
