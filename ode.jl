@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.38
+# v0.19.36
 
 using Markdown
 using InteractiveUtils
@@ -10,6 +10,7 @@ using DifferentialEquations
 # ╔═╡ 7aa3b70a-827a-482c-8052-7d34413922d4
 begin
 	using Plots
+	import PlotlyBase
 	plotly()
 end
 
