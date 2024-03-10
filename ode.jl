@@ -11,6 +11,7 @@ using DifferentialEquations
 begin
 	using Plots
 	import PlotlyBase
+	import PlotlyKaleido
 	plotly()
 end
 
@@ -52,16 +53,25 @@ plot(sol)
 sol
 
 # ╔═╡ 67bd3b97-8dbe-41da-ae4c-dc92c326d8a1
-plot(sol,vars=(1,2,3), lw=1)
+plot(sol, idxs=(1,2,3), lw=1)
+
+# ╔═╡ 9ddddc3a-bac3-446b-9602-7ff7a3e85a35
+md"""
+[https://www.dynamicmath.xyz/strange-attractors/](https://www.dynamicmath.xyz/strange-attractors/) にはおしゃれな例がいっぱいある．興味のある方は遊んでみると良いかも．
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
 DifferentialEquations = "~7.7.0"
+PlotlyBase = "~0.8.19"
+PlotlyKaleido = "~2.2.4"
 Plots = "~1.40.1"
 """
 
@@ -71,7 +81,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.2"
 manifest_format = "2.0"
-project_hash = "726792d53af180d559a19dd5121df25892b8d9aa"
+project_hash = "8103cf9dc6136cbf9759f63adb0ffad836c49106"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f5c25e8a5b29b5e941b7408bc8cc79fea4d9ef9a"
@@ -763,6 +773,12 @@ git-tree-sha1 = "884c2968c2e8e7e6bf5956af88cb46aa745c854b"
 uuid = "ef3ab10e-7fda-4108-b977-705223b18434"
 version = "0.4.1"
 
+[[deps.Kaleido_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "43032da5832754f58d14a91ffbe86d5f176acda9"
+uuid = "f7e6163d-2fa5-5f23-b69c-1db539e41963"
+version = "0.2.1+0"
+
 [[deps.Krylov]]
 deps = ["LinearAlgebra", "Printf", "SparseArrays"]
 git-tree-sha1 = "8a6837ec02fe5fb3def1abc907bb802ef11a0729"
@@ -1180,6 +1196,18 @@ deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random"
 git-tree-sha1 = "7b1a9df27f072ac4c9c7cbe5efb198489258d1f5"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.4.1"
+
+[[deps.PlotlyBase]]
+deps = ["ColorSchemes", "Dates", "DelimitedFiles", "DocStringExtensions", "JSON", "LaTeXStrings", "Logging", "Parameters", "Pkg", "REPL", "Requires", "Statistics", "UUIDs"]
+git-tree-sha1 = "56baf69781fc5e61607c3e46227ab17f7040ffa2"
+uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+version = "0.8.19"
+
+[[deps.PlotlyKaleido]]
+deps = ["Base64", "JSON", "Kaleido_jll"]
+git-tree-sha1 = "2650cd8fb83f73394996d507b3411a7316f6f184"
+uuid = "f2990250-8cf9-495f-b13a-cce12b45703c"
+version = "2.2.4"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
@@ -2047,5 +2075,6 @@ version = "1.4.1+1"
 # ╠═a2b8adc1-ba82-4a66-aac7-88bb8b717b72
 # ╠═def2042c-5d56-4ddd-ab40-d36c1fca8970
 # ╠═67bd3b97-8dbe-41da-ae4c-dc92c326d8a1
+# ╟─9ddddc3a-bac3-446b-9602-7ff7a3e85a35
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
